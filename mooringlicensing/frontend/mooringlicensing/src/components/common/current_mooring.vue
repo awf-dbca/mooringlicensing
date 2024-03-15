@@ -91,6 +91,9 @@ from '@/utils/hooks'
                     displayText += `Your ${this.proposal.approval_type_text} ${this.proposal.approval_lodgement_number}
                     lists moorings ${this.proposal.authorised_user_moorings_str}.
                         Do you want to apply to add another mooring to your Authorised User Permit?`;
+                } else if (this.proposal && this.proposal.approval_lodgement_number) {
+                    displayText += `There are no moorings currently listed on your ${this.proposal.approval_type_text} ${this.proposal.approval_lodgement_number}.
+                        Do you want to apply to add a mooring to your Authorised User Permit?`;
                 }
                 /*
                 if (this.proposal && this.proposal.mooring_licence_vessels && this.proposal.mooring_licence_vessels.length) {
