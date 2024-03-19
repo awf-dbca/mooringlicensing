@@ -4188,6 +4188,11 @@ class Mooring(RevisionedMixin):
     # mooring licence can onl,y have one Mooring
     mooring_licence = models.OneToOneField('MooringLicence', blank=True, null=True, related_name="mooring", on_delete=models.SET_NULL)
 
+    def remove_license(self, request, reason):
+        self.mooring_licence = None
+        self.save()
+        self.handle_aups_after_save_mooring(request, reason)
+
     def handle_aups_after_save_mooring(self, request, reason):
         logger.debug(f'in handle_aups_after_save_mooring().  self: [{self}]')
 

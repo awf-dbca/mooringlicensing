@@ -957,7 +957,8 @@ class Approval(RevisionedMixin):
 
                 #handle AUPs for mooring licenses
                 if type(self.child_obj) == MooringLicence:
-                    self.child_obj.processes_after_cancel(request, Mooring.AUP_CANCELLED_MOORING_CANCELLED)
+                    mooring = Mooring.objects.filter(mooring_license=self.child_obj)
+                    mooring.remove_license(request, Mooring.AUP_CANCELLED_MOORING_CANCELLED)
 
                 #discard current proposal if not already approved/expired/declined
                 current_proposal = self.current_proposal
@@ -1084,7 +1085,8 @@ class Approval(RevisionedMixin):
 
                 #handle AUPs for mooring licenses
                 if type(self.child_obj) == MooringLicence:
-                    self.child_obj.processes_after_cancel(request, Mooring.AUP_CANCELLED_MOORING_SURRENDERED)
+                    mooring = Mooring.objects.filter(mooring_license=self.child_obj)
+                    mooring.remove_license(request, Mooring.AUP_CANCELLED_MOORING_SURRENDERED)
 
                 #discard current proposal if not already approved/expired/declined
                 current_proposal = self.current_proposal
@@ -2001,15 +2003,6 @@ class MooringLicence(Approval):
 
     def process_after_discarded(self):
         logger.debug(f'in ML called.')
-
-    def process_after_cancel(self,request,reason):
-        moorings = self.moorings
-
-        for mooring in moorings:
-            mooring.mooring_licence = None
-            mooring.save()
-            mooring.handle_aups_after_save_mooring(request, Mooring.AUP_CANCELLED_MOORING_SWAPPED)
-
 
     class Meta:
         app_label = 'mooringlicensing'

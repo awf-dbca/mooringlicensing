@@ -428,6 +428,7 @@ class ApprovalSerializer(serializers.ModelSerializer):
         if type(obj.child_obj) == MooringLicence:
             moa_set = MooringOnApproval.objects.filter(
                     mooring=obj.child_obj.mooring,
+                    end_date__lt=datetime.now(pytz.timezone(TIME_ZONE)).date()
                     )
             for moa in moa_set:
                 approval = moa.approval
