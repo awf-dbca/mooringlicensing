@@ -1111,3 +1111,43 @@ def send_aup_revoked_due_to_relinquishment_email(request, authorised_user_permit
 # 39
 # email to account holder with authentication link to complete login process
 # TODO: can we overwrite this template served by the ledger?
+
+def send_aup_revoked_due_to_surrender_email(request, authorised_user_permit, mooring, stickers_to_be_returned):
+    # 40
+    # email to authorised user when mooring site authorisation revoked due to mooring site licence surrender and to return sticker
+    proposal = authorised_user_permit.current_proposal
+    approval = authorised_user_permit
+
+    email = TemplateEmailBase(
+        subject='Authorised Use of {} Cancelled Due to Surrender - Notice to Return Sticker(s) - Rottnest Island Authority'.format(mooring.name),
+        html_template='mooringlicensing/emails_2/email_40.html',
+        txt_template='mooringlicensing/emails_2/email_40.txt',
+    )
+
+    attachments = []
+    attachment = authorised_user_permit.get_licence_document_as_attachment()
+    if attachment:
+        attachments.append(attachment)
+
+    context = {
+        'public_url': get_public_url(request),
+        'recipient': authorised_user_permit.submitter_obj,
+        'mooring': mooring,
+        'stickers_to_be_returned': stickers_to_be_returned,
+        'dashboard_external_url': get_public_url(request),
+    }
+
+    all_ccs = []
+    if proposal.org_applicant and proposal.org_applicant.email:
+        cc_list = proposal.org_applicant.email
+        if cc_list:
+            all_ccs = [cc_list]
+
+    msg = email.send(proposal.submitter_obj.email, cc=all_ccs, context=context, attachments=attachments)
+    if msg:
+        sender = request.user if request else settings.DEFAULT_FROM_EMAIL
+        _log_approval_email(msg, approval, sender=sender, attachments=attachments)
+        if approval.org_applicant:
+            _log_org_email(msg, approval.org_applicant, proposal.submitter_obj, sender=sender)
+        else:
+            _log_user_email(msg, approval.submitter_obj, proposal.submitter_obj, sender=sender)

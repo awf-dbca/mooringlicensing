@@ -15,7 +15,9 @@ import django_countries
 
 import pytz
 import uuid
-from mooringlicensing.components.approvals.email import send_aup_revoked_due_to_mooring_swap_email, send_aup_revoked_due_to_relinquishment_email
+from mooringlicensing.components.approvals.email import send_aup_revoked_due_to_mooring_swap_email, \
+send_aup_revoked_due_to_relinquishment_email, \
+send_aup_revoked_due_to_surrender_email
 
 from mooringlicensing.ledger_api_utils import retrieve_email_userro, get_invoice_payment_status
 from ledger_api_client.utils import calculate_excl_gst
@@ -4242,8 +4244,8 @@ class Mooring(RevisionedMixin):
                     send_aup_revoked_due_to_mooring_swap_email(request, active_mooring_on_approval.approval.child_obj, active_mooring_on_approval.mooring, [active_mooring_on_approval.sticker,])
                 elif reason == Mooring.AUP_CANCELLED_MOORING_CANCELLED:
                     send_aup_revoked_due_to_relinquishment_email(request, active_mooring_on_approval.approval.child_obj, active_mooring_on_approval.mooring, [active_mooring_on_approval.sticker,])
-                #TODO surrender email
-
+                elif reason == Mooring.AUP_CANCELLED_MOORING_SURRENDERED:
+                    send_aup_revoked_due_to_surrender_email(request, active_mooring_on_approval.approval.child_obj, active_mooring_on_approval.mooring, [active_mooring_on_approval.sticker,])
 
     def __str__(self):
         return f'{self.name} (Bay: {self.mooring_bay.name})'
