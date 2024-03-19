@@ -768,7 +768,8 @@ class Approval(RevisionedMixin):
 
     @property
     def can_reinstate(self):
-        return (self.status == Approval.APPROVAL_STATUS_CANCELLED or self.status == Approval.APPROVAL_STATUS_SUSPENDED or self.status == Approval.APPROVAL_STATUS_SURRENDERED) and self.can_action
+        #return (self.status == Approval.APPROVAL_STATUS_CANCELLED or self.status == Approval.APPROVAL_STATUS_SUSPENDED or self.status == Approval.APPROVAL_STATUS_SURRENDERED) and self.can_action
+        return (self.status == Approval.APPROVAL_STATUS_SUSPENDED) and self.can_action
 
     @property
     def allowed_assessors(self):
@@ -953,6 +954,24 @@ class Approval(RevisionedMixin):
 
                 if type(self.child_obj) == WaitingListAllocation:
                     self.child_obj.processes_after_cancel()
+
+                #handle AUPs for mooring licenses
+                if type(self.child_obj) == MooringLicence:
+                    self.child_obj.processes_after_cancel(request, Mooring.AUP_CANCELLED_MOORING_CANCELLED)
+
+                #discard current proposal if not already approved/expired/declined
+                current_proposal = self.current_proposal
+                if current_proposal.processing_status not in (
+                    Proposal.PROCESSING_STATUS_APPROVED,
+                    Proposal.PROCESSING_STATUS_EXPIRED,
+                    Proposal.PROCESSING_STATUS_DECLINED):
+                    current_proposal.destroy(request)
+
+                #handle stickers (should automatically update via save)
+                stickers = self.stickers
+                #for i in stickers:
+                #    i.save()
+
                 # Log proposal action
                 self.log_user_action(ApprovalUserAction.ACTION_CANCEL_APPROVAL.format(self.id),request)
                 # Log entry for organisation
@@ -1062,6 +1081,24 @@ class Approval(RevisionedMixin):
                 self.save()
                 if type(self.child_obj) == WaitingListAllocation:
                     self.child_obj.processes_after_cancel()
+
+                #handle AUPs for mooring licenses
+                if type(self.child_obj) == MooringLicence:
+                    self.child_obj.processes_after_cancel(request, Mooring.AUP_CANCELLED_MOORING_SURRENDERED)
+
+                #discard current proposal if not already approved/expired/declined
+                current_proposal = self.current_proposal
+                if current_proposal.processing_status not in (
+                    Proposal.PROCESSING_STATUS_APPROVED,
+                    Proposal.PROCESSING_STATUS_EXPIRED,
+                    Proposal.PROCESSING_STATUS_DECLINED):
+                    current_proposal.destroy(request)
+
+                #handle stickers (should automatically update via save)
+                stickers = self.stickers
+                #for i in stickers:
+                #    i.save()
+
                 # Log approval action
                 self.log_user_action(ApprovalUserAction.ACTION_SURRENDER_APPROVAL.format(self.id),request)
                 # Log entry for proposal
@@ -1964,6 +2001,15 @@ class MooringLicence(Approval):
 
     def process_after_discarded(self):
         logger.debug(f'in ML called.')
+
+    def process_after_cancel(self,request,reason):
+        moorings = self.moorings
+
+        for mooring in moorings:
+            mooring.mooring_licence = None
+            mooring.save()
+            mooring.handle_aups_after_save_mooring(request, Mooring.AUP_CANCELLED_MOORING_SWAPPED)
+
 
     class Meta:
         app_label = 'mooringlicensing'

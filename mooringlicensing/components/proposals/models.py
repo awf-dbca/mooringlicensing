@@ -15,7 +15,7 @@ import django_countries
 
 import pytz
 import uuid
-from mooringlicensing.components.approvals.email import send_aup_revoked_due_to_mooring_swap_email
+from mooringlicensing.components.approvals.email import send_aup_revoked_due_to_mooring_swap_email, send_aup_revoked_due_to_relinquishment_email
 
 from mooringlicensing.ledger_api_utils import retrieve_email_userro, get_invoice_payment_status
 from ledger_api_client.utils import calculate_excl_gst
@@ -3924,13 +3924,13 @@ class MooringLicenceApplication(Proposal):
                             current_mooring.mooring_licence = None
                             current_mooring.save()
                             logger.info(f'Remove the link between the MSL: [{approval}] and the mooring: [{current_mooring}].')
-                            current_mooring.handle_aups_after_save_mooring(request)
+                            current_mooring.handle_aups_after_save_mooring(request, Mooring.AUP_CANCELLED_MOORING_SWAPPED)
 
                             temp_licence = target_mooring.mooring_licence
                             target_mooring.mooring_licence = None
                             target_mooring.save()
                             logger.info(f'Remove the link between the MSL: [{temp_licence}] and the mooring: [{target_mooring}].')
-                            target_mooring.handle_aups_after_save_mooring(request)
+                            target_mooring.handle_aups_after_save_mooring(request, Mooring.AUP_CANCELLED_MOORING_SWAPPED)
 
                     # Create new relation between the approval and the mooring
                     target_mooring.mooring_licence = approval
@@ -4162,6 +4162,9 @@ class Mooring(RevisionedMixin):
          (1, 'Rental Mooring'),
          (2, 'Private Mooring'),
     )
+    AUP_CANCELLED_MOORING_SURRENDERED = 'surrendered'
+    AUP_CANCELLED_MOORING_CANCELLED = 'cancelled'
+    AUP_CANCELLED_MOORING_SWAPPED = 'swapped'
 
     name = models.CharField(max_length=100)
     mooring_bay = models.ForeignKey(MooringBay, on_delete=models.CASCADE)
@@ -4183,7 +4186,7 @@ class Mooring(RevisionedMixin):
     # mooring licence can onl,y have one Mooring
     mooring_licence = models.OneToOneField('MooringLicence', blank=True, null=True, related_name="mooring", on_delete=models.SET_NULL)
 
-    def handle_aups_after_save_mooring(self, request):
+    def handle_aups_after_save_mooring(self, request, reason):
         logger.debug(f'in handle_aups_after_save_mooring().  self: [{self}]')
 
         from mooringlicensing.components.approvals.models import Approval, MooringOnApproval
@@ -4235,7 +4238,11 @@ class Mooring(RevisionedMixin):
 
                 active_mooring_on_approval.approval.manage_stickers()  
                 active_mooring_on_approval.approval.generate_doc()
-                send_aup_revoked_due_to_mooring_swap_email(request, active_mooring_on_approval.approval.child_obj, active_mooring_on_approval.mooring, [active_mooring_on_approval.sticker,])
+                if reason == Mooring.AUP_CANCELLED_MOORING_SWAPPED:
+                    send_aup_revoked_due_to_mooring_swap_email(request, active_mooring_on_approval.approval.child_obj, active_mooring_on_approval.mooring, [active_mooring_on_approval.sticker,])
+                elif reason == Mooring.AUP_CANCELLED_MOORING_CANCELLED:
+                    send_aup_revoked_due_to_relinquishment_email(request, active_mooring_on_approval.approval.child_obj, active_mooring_on_approval.mooring, [active_mooring_on_approval.sticker,])
+                #TODO surrender email
 
 
     def __str__(self):
