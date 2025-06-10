@@ -46,13 +46,17 @@ Vue.http.interceptors.push( function ( request, next ) {
   next();
 } );
 
+const app = createApp(App);
+
+app.use(router);
+router.isReady().then(() => app.mount('#app'));
 
 /* eslint-disable no-new */
-new Vue( {
-  el: '#app',
-  router,
-  template: '<App/>',
-  components: {
-    App
-  }
-} )
+//new Vue( {
+//  el: '#app',
+//  router,
+//  template: '<App/>',
+//  components: {
+//    App
+//  }
+//} )

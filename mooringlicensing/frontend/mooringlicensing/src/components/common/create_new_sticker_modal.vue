@@ -2,7 +2,7 @@
     <div id="change-contact">
         <modal transition="modal fade" @ok="ok()" @cancel="cancel()" :title="title" large>
             <div class="container-fluid">
-                <alert :show.sync="showError" type="danger"><strong>{{ errorString }}</strong></alert>
+                <alert v-model:show="showError" type="danger"><strong>{{ errorString }}</strong></alert>
                 <div v-if="!replacementFee" class="row form-group">
                     <label class="col-sm-2 control-label">Mailed Date</label>
                     <div class="col-sm-3">

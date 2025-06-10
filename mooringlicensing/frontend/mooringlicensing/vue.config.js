@@ -30,7 +30,15 @@ module.exports = defineConfig({
         config.resolve.alias.set(
             'datetimepicker',
             path.resolve(__dirname, 'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js')
-        )
+        );
+        config.resolve.alias.set("vue", "@vue/compat");
+        config.module
+            .rule("vue")
+            .use("vue-loader")
+            .tap((options) => {
+                return { ...options, compilerOptions: { compatConfig: { MODE: 3 } } };
+            }
+        );
     },
     configureWebpack: {
         devtool: 'source-map',

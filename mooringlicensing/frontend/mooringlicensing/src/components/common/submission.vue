@@ -13,15 +13,17 @@
                     </div>
                     <div class="col-sm-12 top-buffer-s">
                         <strong>Lodged on</strong><br/>
-                        {{ lodgement_date | formatDate}}
+                        {{ formatted_date }}
                     </div>
                     <div class="col-sm-12 top-buffer-s">
                         <table class="table small-table">
-                            <tr>
-                                <th>Lodgement</th>
-                                <th>Date</th>
-                                <th>Action</th>
-                            </tr>
+                            <thead>
+                                <tr>
+                                    <th>Lodgement</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
                         </table>
                     </div>
                 </div>
@@ -47,9 +49,9 @@ export default {
             default: null,
         },
     },
-    filters: {
-        formatDate: function(data){
-            return data ? moment(data).format('DD/MM/YYYY HH:mm:ss'): '';
+    computed: {
+        formatted_date: function(){
+            return this.lodgement_date ? moment(this.lodgement_date).format('DD/MM/YYYY HH:mm:ss'): '';
         }
     },
 }

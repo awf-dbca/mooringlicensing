@@ -17,15 +17,17 @@
                             </div>
                             <div class="col-sm-12 top-buffer-s">
                                 <strong>Lodged on</strong><br/>
-                                {{ compliance.lodgement_date | formatDate}}
+                                {{ formatted_date }}
                             </div>
                             <div class="col-sm-12 top-buffer-s">
                                 <table class="table small-table">
-                                    <tr>
-                                        <th>Lodgement</th>
-                                        <th>Date</th>
-                                        <th>Action</th>
-                                    </tr>
+                                    <thead>
+                                        <tr>
+                                            <th>Lodgement</th>
+                                            <th>Date</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
                                 </table>
                             </div>
                         </div>
@@ -80,7 +82,7 @@
                         <div class="row">
                            <div class="col-md-12"> 
                             <form class="form-horizontal" name="complianceForm" method="post">
-                                <alert :show.sync="showError" type="danger">
+                                <alert v-model:show="showError" type="danger">
                                     <strong>{{errorString}}</strong>
                                 </alert>
                                 <div class="row">
@@ -204,10 +206,6 @@ export default {
         ]
     }
   },
-  filters: {
-    formatDate: function(data){
-        return data ? moment(data).format('DD/MM/YYYY'): '';    }
-  },
   beforeRouteEnter: function(to, from, next){
     Vue.http.get(helpers.add_endpoint_json(api_endpoints.compliances,to.params.compliance_id+'/internal_compliance')).then((response) => {
         next(vm => {
@@ -243,7 +241,10 @@ export default {
     },
     hasDocuments: function(){             
         return this.compliance && this.compliance.documents;
-    }
+    },
+    formatted_date: function(){
+        return this.compliance.lodgement_date ? moment(this.compliance.lodgement_date).format('DD/MM/YYYY HH:mm:ss'): '';
+    },
   },
   methods: {
     delete_document: function(doc){

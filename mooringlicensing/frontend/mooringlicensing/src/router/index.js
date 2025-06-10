@@ -5,11 +5,10 @@ import external_routes from '@/components/external/routes'
 import internal_routes from '@/components/internal/routes'
 import MooringLicenceDocumentsUpload from '@/components/external/mooring_licence_documents_upload'
 import DcvAdmissionForm from '@/components/external/dcv/dcv_admission'
+import * as VueRouter from 'vue-router';
 
-Vue.use(Router)
-
-export default new Router({
-    mode: 'history',
+const router = VueRouter.createRouter({
+    history: VueRouter.createWebHistory(),
     routes: [
         {
           path: '/firsttime',
@@ -35,3 +34,5 @@ export default new Router({
         }
     ]
 })
+
+export default router;

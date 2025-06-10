@@ -2,7 +2,7 @@
     <div id="change-contact">
         <modal transition="modal fade" @ok="ok()" @cancel="cancel()" :title="title" large>
             <div class="container-fluid">
-                <alert :show.sync="showError" type="danger"><strong>{{ errorString }}</strong></alert>
+                <alert v-model:show="showError" type="danger"><strong>{{ errorString }}</strong></alert>
                 <div class="row form-group">
                     <table class="table table-striped table-bordered">
                         <thead>
@@ -16,7 +16,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="sticker in stickers" :key="sticker.id"  v-if="sticker.status.code == 'ready' || sticker.status.code == 'not_yet_ready'">
+                            <tr v-for="sticker in non_exported_stickers" :key="sticker.id">
                                 <td><input v-if="sticker.status.code == 'ready' || sticker.status.code == 'not_yet_ready'" type="checkbox" v-model="sticker.checked" /></td>
                                 <td v-if="sticker.number">{{ sticker.number }}</td>
                                 <td v-else>Not Assigned</td>
@@ -136,6 +136,11 @@ export default {
         }
     },
     computed: {
+        non_exported_stickers: function(){
+            return this.stickers.filter(sticker => {
+                return sticker.status.code == 'ready' || sticker.status.code == 'not_yet_ready';
+            });
+        },
         okButtonEnabled: function(){
             for (let sticker of this.stickers){
                 if (sticker.checked === true){
