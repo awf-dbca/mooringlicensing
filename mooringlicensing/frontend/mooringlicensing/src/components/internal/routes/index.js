@@ -31,7 +31,7 @@ export default
     },
     children: [
         {
-            path: '/',
+            path: '/internal',
             component: InternalDashboard,
             name: 'internal-dashboard'
         },
@@ -57,24 +57,13 @@ export default
         },
         {
             path: 'moorings',
-            component: {
-                render(c)
-                {
-                    return c('router-view')
-                }
-            },
-            children: [
-                {
-                    path: '/',
-                    component: MooringsDash,
-                    name: "internal-moorings-dash",
-                },
-                {
-                    path: ':mooring_id',
-                    component: MooringDetail,
-                    name:"internal-mooring-detail"
-                },
-            ]
+            component: MooringsDash,
+            name: "internal-moorings-dash",
+        },
+        {
+            path: 'moorings/:mooring_id',
+            component: MooringDetail,
+            name:"internal-mooring-detail"
         },
         {
             path: 'vessel',
@@ -140,28 +129,21 @@ export default
             name:'reports',
             component:Reports
         },
-        {
-            path: 'dcv',
-            component: {
-                render(c)
+        
+
                 {
-                    return c('router-view')
-                }
-            },
-            children: [
-                {
-                    path: '/',
+                    path: 'dcv',
                     component: DcvDashboard,
                     name:"internal-dcv-dash"
                 },
                 {
-                    path: 'dcv_admission_form',
+                    path: 'dcv/dcv_admission_form',
                     component: DcvAdmissionForm,
                     name:"internal-dcv-admission-form",
                     props: {is_internal:true}, 
-                }
-            ]
-        },
+                },
+            
+
         {
             path: 'proposal',
             component: {
@@ -179,19 +161,8 @@ export default
                 },
                 {
                     path: ':proposal_id',
-                    component: {
-                        render(c)
-                        {
-                            return c('router-view')
-                        }
-                    },
-                    children: [
-                        {
-                            path: '/',
-                            component: Proposal,
-                            name:"internal-proposal"
-                        },
-                    ]
+                    component: Proposal,
+                    name:"internal-proposal"
                 },
             ]
         },

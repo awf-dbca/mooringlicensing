@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import { createApp } from 'vue';
 import resource from 'vue-resource'
 import App from './App'
 import router from './router'
