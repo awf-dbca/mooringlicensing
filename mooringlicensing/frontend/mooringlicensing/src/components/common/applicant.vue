@@ -312,7 +312,7 @@
 import datatable from '@/utils/vue/datatable.vue'
 import FileField from '@/components/forms/filefield_immediate.vue'
 import {
-    api_endpoints
+    api_endpoints, utils
 }
 from '@/utils/hooks'
 export default {
@@ -454,8 +454,11 @@ export default {
         },
         fetchCountries: function () {
             let vm = this;
-            vm.$http.get(api_endpoints.countries).then((response) => {
-                vm.countries = response.body;
+            let request = utils.fetchUrl(api_endpoints.countries);
+            request.then((response) => {
+                vm.countries = response;
+            }).catch((error) => {
+                console.log(error.message);
             });
         },
     },

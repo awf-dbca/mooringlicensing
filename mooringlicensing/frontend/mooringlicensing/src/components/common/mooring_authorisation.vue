@@ -354,13 +354,12 @@ import draggable from 'vuedraggable';
             readMooringSiteId: async function() {
                 let vm = this;
                 if (vm.proposal.mooring_id) {
-                    const res = await vm.$http.get(`${api_endpoints.mooring}${vm.proposal.mooring_id}/fetch_mooring_name`);
-                    var option = new Option(res.body.name, vm.proposal.mooring_id, true, true);
+                    //TODO check for vue 3 changes
+                    const res = await utils.fetchUrl(`${api_endpoints.mooring}${vm.proposal.mooring_id}/fetch_mooring_name`);
+                    var option = new Option(res.name, vm.proposal.mooring_id, true, true);
                     $(vm.$refs.mooring_lookup).append(option).trigger('change');
                 }
             },
-
-
         },
         mounted:function () {
             window.removeSiteLicenseeMooring = (mooring_id) => {

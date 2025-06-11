@@ -52,7 +52,7 @@
 <script>
 import datatable from '@/utils/vue/datatable.vue'
 import Vue from 'vue'
-import { api_endpoints, helpers } from '@/utils/hooks'
+import { api_endpoints, helpers, utils } from '@/utils/hooks'
 export default {
     name: 'TableApplications',
     props: {
@@ -532,28 +532,32 @@ export default {
         },
         fetchFilterLists: function(){
             let vm = this;
+            
+            let request = utils.fetchUrl(api_endpoints.application_types_dict+'?apply_page=False');
+            request.then((response) => {
+                vm.application_types = response;
+            }).catch((error) => {
+                console.log(error.message);
+            });
 
-            // Application Types
-            vm.$http.get(api_endpoints.application_types_dict+'?apply_page=False').then((response) => {
-                vm.application_types = response.body
-            },(error) => {
-            })
-
-            // Application Categories
-            vm.$http.get(api_endpoints.application_categories_dict+'?apply_page=False').then((response) => {
-                vm.application_categories = response.body
-            },(error) => {
-            })
+            request = utils.fetchUrl(api_endpoints.application_categories_dict+'?apply_page=False');
+            request.then((response) => {
+                vm.application_categories = response;
+            }).catch((error) => {
+                console.log(error.message);
+            });
 
             // Application Statuses
-            vm.$http.get(api_endpoints.application_statuses_dict).then((response) => {
+            request = utils.fetchUrl(api_endpoints.application_statuses_dict)
+            request.then((response) => {
                 if (vm.is_internal){
-                    vm.application_statuses = response.body.internal_statuses
+                    vm.application_statuses = response.internal_statuses
                 } else {
-                    vm.application_statuses = response.body.external_statuses
+                    vm.application_statuses = response.external_statuses
                 }
-            },(error) => {
-            })
+            }).catch((error) => {
+                console.log(error.message);
+            });
         },
         addEventListeners: function(){
             let vm = this

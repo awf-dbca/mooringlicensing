@@ -78,7 +78,7 @@
 <script>
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
-import { api_endpoints } from "@/utils/hooks.js"
+import { api_endpoints, utils } from "@/utils/hooks.js"
 
 export default {
     name:'CreateNewStickerModal',
@@ -199,20 +199,20 @@ export default {
         },
         fetchData: function(){
             let vm = this
-
-            vm.$http.get(api_endpoints.fee_item_sticker_replacement).then(
-                (response) => {
-                    vm.fee_item = response.body
-                },
-                (error) => {
-                    console.log(error)
-                }
-            )
+            let request = utils.fetchUrl(api_endpoints.fee_item_sticker_replacement)
+            request.then((response) => {
+                vm.fee_item = response;
+            }).catch((error) => {
+                console.log(error.message);
+            });
         },
         fetchCountries: function () {
             let vm = this;
-            vm.$http.get(api_endpoints.countries).then((response) => {
-                vm.countries = response.body;
+            let request = utils.fetchUrl(api_endpoints.countries);
+            request.then((response) => {
+                vm.countries = response;
+            }).catch((error) => {
+                console.log(error.message);
             });
         },
     },

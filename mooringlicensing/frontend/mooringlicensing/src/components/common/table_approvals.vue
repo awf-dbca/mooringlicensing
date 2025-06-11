@@ -121,7 +121,7 @@ import RequestNewStickerModal from "@/components/common/request_new_sticker_moda
 import RequestStickerAddressModal from "@/components/common/request_sticker_address_modal.vue"
 import SwapMooringsModal from "@/components/common/swap_moorings_modal.vue"
 import Vue from 'vue'
-import { api_endpoints, helpers }from '@/utils/hooks'
+import { api_endpoints, helpers, utils }from '@/utils/hooks'
 
 export default {
     name: 'TableApprovals',
@@ -913,12 +913,12 @@ export default {
         },
         fetchProfile: function(){
             let vm = this;
-            Vue.http.get(api_endpoints.profile).then((response) => {
+            let request = utils.fetchUrl(api_endpoints.profile);
+            request.then((response) => {
                 vm.profile = response.body
-
-            },(error) => {
-
-            })
+            }).catch((error) => {
+                console.log(error.message);
+            });
         },
         offerMooringLicence: function(id){
             this.selectedWaitingListAllocationId = parseInt(id);
@@ -1070,8 +1070,8 @@ export default {
         },
         fetchFilterLists: async function(){
             // Status values
-            const statusRes = await this.$http.get(api_endpoints.approval_statuses_dict);
-            for (let s of statusRes.body) {
+            const statusRes = await utils.fetchUrl(api_endpoints.approval_statuses_dict);
+            for (let s of statusRes) {
                 if (this.wlaDash && !(['extended', 'awaiting_payment', 'approved'].includes(s.code))) {
                     this.statusValues.push(s);
                 } else if (!(['extended', 'awaiting_payment', 'offered', 'approved'].includes(s.code))) {
@@ -1079,15 +1079,15 @@ export default {
                 }
             }
             // Approval types
-            const approvalRes = await this.$http.get(api_endpoints.approval_types_dict + '?include_codes=' + this.approvalTypeFilter.join(','));
-            for (let t of approvalRes.body) {
+            const approvalRes = await utils.fetchUrl(api_endpoints.approval_types_dict + '?include_codes=' + this.approvalTypeFilter.join(','));
+            for (let t of approvalRes) {
                 if (t.code !== 'wla') {
                     this.approvalTypes.push(t);
                 }
             }
             // Mooring bays
-            const mooringBayRes = await this.$http.get(api_endpoints.mooring_bays);
-            for (let b of mooringBayRes.body.results) {
+            const mooringBayRes = await utils.fetchUrl(api_endpoints.mooring_bays);
+            for (let b of mooringBayRes.results) {
                 this.mooringBays.push(b);
             }
         },
