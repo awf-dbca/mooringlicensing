@@ -1,4 +1,4 @@
-
+import { RouterView } from 'vue-router';
 import InternalDashboard from '@/components/internal/dashboard.vue'
 import Proposal from '@/components/internal/proposals/proposal.vue'
 import DcvDashboard from '@/components/internal/dcv/dashboard.vue'
@@ -19,16 +19,12 @@ import ProposalApply from '@/components/external/proposal_apply.vue'
 import DcvAdmissionForm from '@/components/external/dcv/dcv_admission.vue'
 import DcvPermit from '@/components/external/dcv/dcv_permit.vue'
 
+
+
 export default
 {
     path: '/internal',
-    component:
-    {
-        render(c)
-        {
-            return c('router-view')
-        }
-    },
+    component: RouterView,
     children: [
         {
             path: '/internal',
@@ -67,12 +63,7 @@ export default
         },
         {
             path: 'vessel',
-            component: {
-                render(c)
-                {
-                    return c('router-view')
-                }
-            },
+            component: RouterView,
             children: [
                 {
                     path: ':vessel_id',
@@ -83,13 +74,7 @@ export default
         },
         {
             path: 'vesselownership',
-            component:
-            {
-                render(c)
-                {
-                    return c('router-view')
-                }
-            },
+            component: RouterView,
             children: [
                 {
                     path: ':vessel_id',
@@ -129,29 +114,20 @@ export default
             name:'reports',
             component:Reports
         },
-        
-
-                {
-                    path: 'dcv',
-                    component: DcvDashboard,
-                    name:"internal-dcv-dash"
-                },
-                {
-                    path: 'dcv/dcv_admission_form',
-                    component: DcvAdmissionForm,
-                    name:"internal-dcv-admission-form",
-                    props: {is_internal:true}, 
-                },
-            
-
+        {
+            path: 'dcv',
+            component: DcvDashboard,
+            name:"internal-dcv-dash"
+        },
+        {
+            path: 'dcv/dcv_admission_form',
+            component: DcvAdmissionForm,
+            name:"internal-dcv-admission-form",
+            props: {is_internal:true}, 
+        },
         {
             path: 'proposal',
-            component: {
-                render(c)
-                {
-                    return c('router-view')
-                }
-            },
+            component: RouterView,
             children: [
                 {
                     path: '/',

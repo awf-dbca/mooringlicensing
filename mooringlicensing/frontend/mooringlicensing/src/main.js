@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import { createApp } from 'vue';
-import resource from 'vue-resource'
 import App from './App'
 import router from './router'
 import bs from 'bootstrap'
@@ -34,30 +33,33 @@ import '@/../node_modules/datatables.net-buttons-bs/css/buttons.bootstrap.min.cs
 
 Vue.config.devtools = true;
 Vue.config.productionTip = false
-Vue.use( resource );
+//Vue.use( resource );
 
 // Add CSRF Token to every request
-Vue.http.interceptors.push( function ( request, next ) {
-  // modify headers
-  if ( request.url != api_endpoints.countries ) {
-    request.headers.set( 'X-CSRFToken', helpers.getCookie( 'csrftoken' ) );
-  }
-
-  // continue to next interceptor
-  next();
-} );
+const customHeaders = new Headers({
+    'X-CSRFToken': helpers.getCookie('csrftoken'),
+});
+const customHeadersJSON = new Headers({
+    'X-CSRFToken': helpers.getCookie('csrftoken'),
+    'Content-Type': 'application/json',
+});
 
 const app = createApp(App);
 
+const fetch = window.fetch;
+window.fetch = ((originalFetch) => {
+    return (...args) => {
+        if (args.length > 1) {
+            if (typeof args[1].body === 'string') {
+                args[1].headers = customHeadersJSON;
+            } else {
+                args[1].headers = customHeaders;
+            }
+        }
+        const result = originalFetch.apply(this, args);
+        return result;
+    };
+})(fetch);
+
 app.use(router);
 router.isReady().then(() => app.mount('#app'));
-
-/* eslint-disable no-new */
-//new Vue( {
-//  el: '#app',
-//  router,
-//  template: '<App/>',
-//  components: {
-//    App
-//  }
-//} )
