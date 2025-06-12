@@ -85,7 +85,8 @@
 </template>
 <script>
 import {
-    api_endpoints
+    api_endpoints,
+    utils,
 }
 from '@/utils/hooks'
 import FormSection from "@/components/forms/section_toggle.vue"
@@ -110,8 +111,6 @@ export default {
             title_class_name: 'col-sm-3 proposed-decision-title',
             value_class_name: 'col-sm-9 proposed-decision-value',
         }
-    },
-    watch:{
     },
     components:{
         FormSection,
@@ -227,7 +226,7 @@ export default {
                 mooring_id = this.proposal.allocated_mooring
             }
             if (mooring_id){
-                const res = await this.$http.get(`${api_endpoints.mooring}${mooring_id}`);
+                const res = await utils.fetchUrl(`${api_endpoints.mooring}${mooring_id}`);
                 this.mooring = res.body
             }
         },

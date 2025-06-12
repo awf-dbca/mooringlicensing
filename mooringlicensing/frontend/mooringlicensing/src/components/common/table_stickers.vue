@@ -46,7 +46,7 @@
 <script>
 import datatable from '@/utils/vue/datatable.vue'
 import Vue from 'vue'
-import { api_endpoints, helpers } from '@/utils/hooks'
+import { api_endpoints, helpers, utils } from '@/utils/hooks'
 export default {
     name: 'TableStickers',
     props: {
@@ -433,25 +433,26 @@ export default {
             let include_codes = vm.approvalTypesToDisplay.join(',');
 
             // Application Types
-            vm.$http.get(api_endpoints.approval_types_dict+'?include_codes=' + include_codes).then((response) => {
-                vm.approval_types = response.body
-            },(error) => {
-                console.log(error);
-            })
+            let request = utils.fetchUrl(api_endpoints.approval_types_dict+'?include_codes=' + include_codes)
+            .then((response) => {
+                vm.approval_types = response;
+            }).catch((error) => {
+                console.log(error.message);
+            });
 
             // Years (FeeSeason)
-            vm.$http.get(api_endpoints.fee_seasons_dict+'?include_codes=' + include_codes).then((response) => {
-                vm.fee_seasons = response.body
-            },(error) => {
-                console.log(error);
-            })
+            request = utils.fetchUrl(api_endpoints.fee_seasons_dict+'?include_codes=' + include_codes).then((response) => {
+                vm.fee_seasons = response;
+            }).catch((error) => {
+                console.log(error.message);
+            });
 
             // Sticker statuses
-            vm.$http.get(api_endpoints.sticker_status_dict+'?include_codes=' + include_codes).then((response) => {
-                vm.sticker_statuses = response.body
-            },(error) => {
-                console.log(error);
-            })
+            request = utils.fetchUrl(api_endpoints.sticker_status_dict+'?include_codes=' + include_codes).then((response) => {
+                vm.sticker_statuses = response;
+            }).catch((error) => {
+                console.log(error.message);
+            });
         },
         updateActionCell: function(sticker){
             let elem = $('#action_cell_contents_id_' + sticker.id)
@@ -550,9 +551,10 @@ export default {
                 let first_td = tr.children().first()
                 if(first_td.hasClass(vm.td_expand_class_name)){
                     // Expand
-                    vm.$http.get(helpers.add_endpoint_json(api_endpoints.stickers, sticker_id)).then(
+                    let request = utils.fetchUrl(helpers.add_endpoint_json(api_endpoints.stickers, sticker_id))
+                    request.then(
                         res => {
-                            let sticker = res.body
+                            let sticker = res;
                             let table_inside = vm.getActionDetailTable(sticker)
                             let details_elem = $('<tr class="' + vm.sticker_details_tr_class_name + '"><td colspan="' + vm.number_of_columns + '">' + table_inside + '</td></tr>')
                             details_elem.hide()
@@ -569,11 +571,10 @@ export default {
                             })
 
                             details_elem.fadeIn(1000)
-                        },
-                        err => {
-
                         }
-                    )
+                    ).catch((error) => {
+                        console.log(error.message);
+                    });
                     // Change icon class name to vm.td_collapse_class_name
                     first_td.removeClass(vm.td_expand_class_name).addClass(vm.td_collapse_class_name)
                 } else {

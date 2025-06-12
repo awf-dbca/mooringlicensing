@@ -97,9 +97,6 @@ export default {
         'CompliancesTable': CompliancesTable,
         'AuthorisedUserApplicationsTable': AuthorisedUserApplicationsTable,
     },
-    watch: {
-
-    },
     computed: {
         is_external: function() {
             return this.level == 'external'

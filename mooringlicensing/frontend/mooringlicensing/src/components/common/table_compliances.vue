@@ -27,7 +27,7 @@
 
 <script>
 import datatable from '@/utils/vue/datatable.vue'
-import { api_endpoints }from '@/utils/hooks'
+import { api_endpoints, utils }from '@/utils/hooks'
 export default {
     name: 'TableCompliances',
     props: {
@@ -293,14 +293,16 @@ export default {
         fetchFilterLists: function(){
             let vm = this;
             // Compliance Statuses
-            vm.$http.get(api_endpoints.compliance_statuses_dict).then((response) => {
+            let request = utils.fetchUrl(api_endpoints.compliance_statuses_dict)
+            request.then((response) => {
                 if (vm.is_internal){
-                    vm.compliance_statuses = response.body.internal_statuses
+                    vm.compliance_statuses = response.internal_statuses
                 } else {
-                    vm.compliance_statuses = response.body.external_statuses
+                    vm.compliance_statuses = response.external_statuses
                 }
-            },(error) => {
-            })
+            }).catch((error) => {
+                console.log(error.message);
+            });
         },
     },
     created: function(){

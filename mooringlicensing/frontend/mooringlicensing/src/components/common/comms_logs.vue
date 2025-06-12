@@ -303,8 +303,6 @@ export default {
     components:{
         AddCommLog
     },
-    watch:{
-    },
     computed: {
     },
     methods:{

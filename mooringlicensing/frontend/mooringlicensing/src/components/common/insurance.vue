@@ -36,7 +36,8 @@
 import FormSection from '@/components/forms/section_toggle.vue'
 import FileField from '@/components/forms/filefield_immediate.vue'
 import {
-  api_endpoints
+  api_endpoints,
+  utils,
 }
 from '@/utils/hooks'
     export default {
@@ -93,8 +94,8 @@ from '@/utils/hooks'
         },
         methods:{
             fetchInsuranceChoices: async function(){
-                const response = await this.$http.get(api_endpoints.insurance_choices_dict);
-                for (let choice of response.body) {
+                const response = await utils.fetchUrl(api_endpoints.insurance_choices_dict);
+                for (let choice of response) {
                     this.insuranceChoices.push(choice);
                 }
             },

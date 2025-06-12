@@ -34,7 +34,7 @@
 <script>
 import datatable from '@/utils/vue/datatable.vue'
 import Vue from 'vue'
-import { api_endpoints, helpers } from '@/utils/hooks'
+import { api_endpoints, helpers, utils } from '@/utils/hooks'
 export default {
     name: 'TableMoorings',
     data() {
@@ -258,17 +258,19 @@ export default {
             let vm = this;
 
             // Statuses
-            vm.$http.get(api_endpoints.mooring_statuses_dict).then((response) => {
-                vm.mooringStatuses = response.body
-            }, (error) => {
-                console.log(error);
-            })
+            let request = utils.fetchUrl(api_endpoints.mooring_statuses_dict)
+            request.then((response) => {
+                vm.mooringStatuses = response
+            }).catch((error) => {
+                console.log(error.message);
+            });
             // Mooring Bays
-            vm.$http.get(api_endpoints.mooring_bays).then((response) => {
-                vm.mooringBays = response.body.results
-            }, (error) => {
-                console.log(error);
-            })
+            request = utils.fetchUrl(api_endpoints.mooring_bays)
+            request.then((response) => {
+                vm.mooringBays = response.results
+            }).catch((error) => {
+                console.log(error.message);
+            });
 
         },
     },

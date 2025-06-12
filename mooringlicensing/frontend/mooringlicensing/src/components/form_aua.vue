@@ -177,10 +177,10 @@
                 type: Boolean,
                 default: true,
             },
-            keepCurrentVessel:{
+            /*keepCurrentVessel:{
                 type: Boolean,
                 default: true, 
-            },
+            },*/
         },
         data:function () {
             return{

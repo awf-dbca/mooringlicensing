@@ -197,7 +197,7 @@ import ApprovalScreen from '@/components/internal/proposals/proposal_approval.vu
 import CommsLogs from '@common-utils/comms_logs.vue'
 import Submission from '@common-utils/submission.vue'
 import Workflow from '@common-utils/workflow.vue'
-import { api_endpoints, helpers, constants } from '@/utils/hooks'
+import { api_endpoints, helpers, constants, utils } from '@/utils/hooks'
 import WaitingListApplication from '@/components/form_wla.vue';
 import AnnualAdmissionApplication from '@/components/form_aaa.vue';
 import AuthorisedUserApplication from '@/components/form_aua.vue';
@@ -667,15 +667,14 @@ export default {
         fetchSiteLicenseeMooring: async function() {
             console.log('%cin fetchSiteLicenseeMooring', 'color:#f33;')
             if (this.proposal.mooring_id){
-                const res = await this.$http.get(`${api_endpoints.mooring}${this.proposal.mooring_id}`);
-                this.siteLicenseeMooring = Object.assign({}, res.body);
+                const res = await utils.fetchUrl(`${api_endpoints.mooring}${this.proposal.mooring_id}`);
+                this.siteLicenseeMooring = Object.assign({}, res);
             }
         },
         fetchMooringBays: async function() {
             console.log('%cin fetchMooringBays', 'color:#f33;')
-            const res = await this.$http.get(api_endpoints.mooring_bays_lookup);
-            console.log(res.body)
-            for (let bay of res.body) {
+            const res = await utils.fetchUrl(api_endpoints.mooring_bays_lookup);
+            for (let bay of res) {
                 this.mooringBays.push(bay)
             }
         },
@@ -830,12 +829,12 @@ export default {
         },
         assignRequestUser: function(){
             let vm = this;
-            vm.$http.get(helpers.add_endpoint_json(api_endpoints.proposal, (vm.proposal.id + '/assign_request_user')))
-            .then((response) => {
+            let request = utils.fetchUrl(helpers.add_endpoint_json(api_endpoints.proposal, (vm.proposal.id + '/assign_request_user')))
+            request.then((response) => {
                 vm.proposal = response.body;
                 vm.original_proposal = helpers.copyObject(response.body);
                 vm.updateAssignedOfficerSelect();
-            }, (error) => {
+            }).catch((error) => {
                 vm.proposal = helpers.copyObject(vm.original_proposal)
                 vm.updateAssignedOfficerSelect();
                 swal(
@@ -891,12 +890,12 @@ export default {
                 });
             }
             else{
-                vm.$http.get(helpers.add_endpoint_json(api_endpoints.proposal, (vm.proposal.id+'/unassign')))
-                .then((response) => {
+                let request = utils.fetchUrl(helpers.add_endpoint_json(api_endpoints.proposal, (vm.proposal.id+'/unassign')))
+                request.then((response) => {
                     vm.proposal = response.body;
                     vm.original_proposal = helpers.copyObject(response.body);
                     vm.updateAssignedOfficerSelect();
-                }, (error) => {
+                }).catch((error) => {
                     vm.proposal = helpers.copyObject(vm.original_proposal)
                     vm.updateAssignedOfficerSelect();
                     swal(
@@ -1059,27 +1058,27 @@ export default {
     },
     created: function() {
         console.log('%cin created', 'color:#f33;')
-        Vue.http.get(`/api/proposal/${this.$route.params.proposal_id}/internal_proposal.json`).then(res => {
+        let request = utils.fetchUrl(`/api/proposal/${this.$route.params.proposal_id}/internal_proposal.json`)
+        request.then(res => {
             console.log('%cproposal has been returned.', 'color: #f11;')
-            this.proposal = res.body;
-            this.original_proposal = helpers.copyObject(res.body);
+            this.proposal = res;
+            this.original_proposal = helpers.copyObject(res);
             this.hasAmendmentRequest=this.proposal.hasAmendmentRequest;
-        },
-        err => {
-          console.log(err);
+        }).catch((error) => {
+            console.log(error.message);
         });
     },
     beforeRouteUpdate: function(to, from, next) {
         console.log("beforeRouteUpdate")
-          Vue.http.get(`/api/proposal/${to.params.proposal_id}.json`).then(res => {
+          let request = utils.fetchUrl(`/api/proposal/${to.params.proposal_id}.json`)
+          request.then(res => {
               next(vm => {
                 vm.proposal = res.body;
                 vm.original_proposal = helpers.copyObject(res.body);
               });
-            },
-            err => {
-              console.log(err);
-            });
+        }).catch((error) => {
+            console.log(error.message);
+        });
     }
 }
 </script>

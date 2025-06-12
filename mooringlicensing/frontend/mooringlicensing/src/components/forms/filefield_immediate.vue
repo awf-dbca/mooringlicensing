@@ -30,7 +30,8 @@
 <script>
 import {
   api_endpoints,
-  helpers
+  helpers,
+  utils,
 }
 from '@/utils/hooks';
 import Vue from 'vue';
@@ -159,14 +160,15 @@ export default {
             if (this.document_action_url) {
                 var formData = new FormData();
                 formData.append('action', 'list');
+                
                 if (this.commsLogId) {
                     formData.append('comms_log_id', this.commsLogId);
                 }
                 formData.append('input_name', this.name);
                 formData.append('csrfmiddlewaretoken', this.csrf_token);
-                let res = await Vue.http.post(this.document_action_url, formData)
-                this.documents = res.body.filedata;
-                this.commsLogId = res.body.comms_instance_id;
+                let res = await utils.fetchUrl(this.document_action_url, {method: "POST", formData})
+                this.documents = res.filedata;
+                this.commsLogId = res.comms_instance_id;
             }
             this.show_spinner = false;
 
@@ -181,6 +183,7 @@ export default {
 
             var formData = new FormData();
             formData.append('action', 'delete');
+            
                 formData.append('input_name', this.name);
             if (this.commsLogId) {
                 formData.append('comms_log_id', this.commsLogId);
@@ -188,7 +191,7 @@ export default {
             formData.append('document_id', file.id);
             formData.append('csrfmiddlewaretoken', this.csrf_token);
             if (this.document_action_url) {
-                let res = await Vue.http.post(this.document_action_url, formData)
+                let res = await utils.fetchUrl(this.document_action_url, {method: "POST", formData})
                 this.documents = res.body.filedata;
                 this.commsLogId = res.body.comms_instance_id;
             }
@@ -200,13 +203,14 @@ export default {
 
             let formData = new FormData();
             formData.append('action', 'cancel');
-                formData.append('input_name', this.name);
+            
+            formData.append('input_name', this.name);
             if (this.commsLogId) {
                 formData.append('comms_log_id', this.commsLogId);
             }
             formData.append('csrfmiddlewaretoken', this.csrf_token);
             if (this.document_action_url) {
-                let res = await Vue.http.post(this.document_action_url, formData)
+                let res = await utils.fetchUrl(this.document_action_url, {method: "POST", formData})
             }
             this.show_spinner = false;
         },
@@ -227,8 +231,8 @@ export default {
             this.show_spinner = true;
             if (this.documentActionUrl === 'temporary_document' && !this.temporary_document_collection_id) {
                 // If temporary_document, create TemporaryDocumentCollection object and allow document_action_url to update
-                const res = await Vue.http.post(this.document_action_url)
-                this.temporary_document_collection_id = res.body.id
+                const res = await utils.fetchUrl(this.document_action_url)
+                this.temporary_document_collection_id = res.id
                 await this.handleChange(e);
                 await this.$emit('update-temp-doc-coll-id', this.temporary_document_collection_id);
             } else {
@@ -251,7 +255,7 @@ export default {
                 formData.append('filename', e.target.files[0].name);
                 formData.append('_file', this.uploadFile(e));
                 formData.append('csrfmiddlewaretoken', this.csrf_token);
-                let res = await Vue.http.post(this.document_action_url, formData)
+                let res = await utils.fetchUrl(this.document_action_url, {method: "POST", formData})
                 
                 this.documents = res.body.filedata;
                 this.commsLogId = res.body.comms_instance_id;

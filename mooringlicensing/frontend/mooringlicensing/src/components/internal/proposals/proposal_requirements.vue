@@ -27,7 +27,8 @@
 <script>
 import {
     api_endpoints,
-    helpers
+    helpers,
+    utils,
 }
 from '@/utils/hooks'
 import datatable from '@vue-utils/datatable.vue'
@@ -195,11 +196,11 @@ export default {
                 confirmButtonText: 'Remove Requirement',
                 confirmButtonColor:'#d9534f'
             }).then(() => {
-                vm.$http.get(helpers.add_endpoint_json(api_endpoints.proposal_requirements,_id+'/discard'))
-                .then((response) => {
+                let request = utils.fetchUrl(helpers.add_endpoint_json(api_endpoints.proposal_requirements,_id+'/discard'))
+                request.then((response) => {
                     vm.$refs.requirements_datatable.vmDataTable.ajax.reload();
-                }, (error) => {
-                    console.log(error);
+                }).catch((error) => {
+                    console.log(error.message);
                 });
 
             },(error) => {
@@ -210,22 +211,24 @@ export default {
             let vm = this;
             let url = api_endpoints.proposal_standard_requirements
             console.log('url: ' + url)
-            vm.$http.get(url, {params: {'application_type_code': vm.proposal.application_type_code}}).then((response) => {
-                vm.requirements = response.body
-            },(error) => {
-                console.log(error);
-            })
+            let request = utils.fetchUrl(url, {params: {'application_type_code': vm.proposal.application_type_code}})
+            request.then((response) => {
+                vm.requirements = response
+            }).catch((error) => {
+                console.log(error.message);
+            });
         },
         editRequirement(_id){
             let vm = this;
-            vm.$http.get(helpers.add_endpoint_json(api_endpoints.proposal_requirements,_id)).then((response) => {
-                this.$refs.requirement_detail.requirement = response.body;
-                this.$refs.requirement_detail.requirement.due_date =  response.body.due_date != null && response.body.due_date != undefined ? moment(response.body.due_date).format('DD/MM/YYYY'): '';
-                response.body.standard ? $(this.$refs.requirement_detail.$refs.standard_req).val(response.body.standard_requirement).trigger('change'): '';
+            let request = utils.fetchUrl(helpers.add_endpoint_json(api_endpoints.proposal_requirements,_id))
+            request.then((response) => {
+                this.$refs.requirement_detail.requirement = response;
+                this.$refs.requirement_detail.requirement.due_date =  response.due_date != null && response.due_date != undefined ? moment(response.body.due_date).format('DD/MM/YYYY'): '';
+                response.standard ? $(this.$refs.requirement_detail.$refs.standard_req).val(response.standard_requirement).trigger('change'): '';
                 this.addRequirement();
-            },(error) => {
-                console.log(error);
-            })
+            }).catch((error) => {
+                console.log(error.message);
+            });
         },
         updatedRequirements(){
             this.$refs.requirements_datatable.vmDataTable.ajax.reload();
@@ -245,12 +248,12 @@ export default {
         },
         sendDirection(req,direction){
             let movement = direction == 'down'? 'move_down': 'move_up';
-            this.$http.get(helpers.add_endpoint_json(api_endpoints.proposal_requirements,req+'/'+movement)).then((response) => {
+            let request = utils.fetchUrl(helpers.add_endpoint_json(api_endpoints.proposal_requirements,req+'/'+movement))
+            request.then((response) => {
                 this.$refs.requirements_datatable.vmDataTable.ajax.reload()
-            },(error) => {
-                console.log(error);
-
-            })
+            }).catch((error) => {
+                console.log(error.message);
+            });
         },
         moveUp(e) {
             // Move the row up

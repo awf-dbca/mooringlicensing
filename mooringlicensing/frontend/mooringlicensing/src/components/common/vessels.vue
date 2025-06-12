@@ -199,7 +199,8 @@ require("select2/dist/css/select2.min.css");
 require("select2-bootstrap-theme/dist/select2-bootstrap.min.css");
 import {
     api_endpoints,
-    helpers
+    helpers,
+    utils,
 }
     from '@/utils/hooks'
 
@@ -662,10 +663,10 @@ export default {
                                     
                                 } 
                                 // retrieve list of Vessel Owners
-                                const res = await vm.$http.get(`${api_endpoints.vessel}${data.id}/lookup_vessel_ownership`);
+                                const res = await utils.fetchUrl(`${api_endpoints.vessel}${data.id}/lookup_vessel_ownership`);
                                 await vm.parseVesselOwnershipList(res);
 
-                                const res_for_length = await vm.$http.get(`${api_endpoints.proposal}${vm.proposal.id}/get_max_vessel_length_for_aa_component?vid=${data.id}`);
+                                const res_for_length = await utils.fetchUrl(`${api_endpoints.proposal}${vm.proposal.id}/get_max_vessel_length_for_aa_component?vid=${data.id}`);
                                 vm.max_vessel_length_for_aa_component = res_for_length.body.max_length
                                 
                             }
@@ -758,8 +759,8 @@ export default {
             }
         },
         fetchVesselTypes: async function () {
-            const response = await this.$http.get(api_endpoints.vessel_types_dict);
-            for (let vessel_type of response.body) {
+            const response = await utils.fetchUrl(api_endpoints.vessel_types_dict);
+            for (let vessel_type of response) {
                 this.vesselTypes.push(vessel_type)
             }
         },
@@ -813,8 +814,8 @@ export default {
             }
         },
         fetchReadonlyVesselCommon: async function (url) {
-            const res = await this.$http.get(url);
-            const vesselData = res.body;
+            const res = await utils.fetchUrl(url);
+            const vesselData = res;
             // read in vessel ownership data from Proposal if in Draft status
             if (this.proposal && this.proposal.processing_status === 'Draft' && !this.proposal.pending_amendment_request) {
                 if (vesselData && vesselData.rego_no ) {
@@ -873,47 +874,47 @@ export default {
                         api_endpoints.proposal,
                         this.proposal.waiting_list_application_id + '/fetch_vessel/'
                     );
-                    res = await this.$http.get(url);
+                    res = await utils.fetchUrl(url);
                 } else if (this.proposal.previous_application_vessel_details_id) {
                     // check vessel ownership on the previous application
                     const url = helpers.add_endpoint_join(
                         api_endpoints.proposal,
                         this.proposal.previous_application_id + '/fetch_vessel/'
                     );
-                    res = await this.$http.get(url);
+                    res = await utils.fetchUrl(url);
                 }
 
 
-                if (!this.proposal.rego_no && res && res.body && !res.body.vessel_ownership.end_date) {
+                if (!this.proposal.rego_no && res && res && !res.vessel_ownership.end_date) {
                     try {
-                        this.vessel.id = res.body.id;
-                        this.vessel.rego_no = res.body.rego_no;
-                        console.log(res.body)
-                        this.vessel.vessel_ownership.percentage = res.body.vessel_ownership.percentage;
-                        this.vessel.vessel_ownership.created = res.body.vessel_ownership.created;
-                        this.vessel.vessel_ownership.dot_name = res.body.vessel_ownership.dot_name;
-                        this.vessel.vessel_ownership.end_name = res.body.vessel_ownership.end_name;
-                        this.vessel.vessel_ownership.id = res.body.vessel_ownership.id;
-                        this.vessel.vessel_ownership.start_date = res.body.vessel_ownership.start_date;
-                        this.vessel.vessel_ownership.updated = res.body.vessel_ownership.updated;
-                        this.vessel.vessel_ownership.vessel = res.body.vessel_ownership.vessel;
-                        this.vessel.vessel_ownership.individual_owner = res.body.vessel_ownership.individual_owner;
-                        this.vessel.vessel_ownership.owner = res.body.vessel_ownership.owner;
-                        this.vessel.vessel_ownership.proposal_id = res.body.vessel_ownership.proposal_id;
+                        this.vessel.id = res.id;
+                        this.vessel.rego_no = res.rego_no;
+                        console.log(res)
+                        this.vessel.vessel_ownership.percentage = res.vessel_ownership.percentage;
+                        this.vessel.vessel_ownership.created = res.vessel_ownership.created;
+                        this.vessel.vessel_ownership.dot_name = res.vessel_ownership.dot_name;
+                        this.vessel.vessel_ownership.end_name = res.vessel_ownership.end_name;
+                        this.vessel.vessel_ownership.id = res.vessel_ownership.id;
+                        this.vessel.vessel_ownership.start_date = res.vessel_ownership.start_date;
+                        this.vessel.vessel_ownership.updated = res.vessel_ownership.updated;
+                        this.vessel.vessel_ownership.vessel = res.vessel_ownership.vessel;
+                        this.vessel.vessel_ownership.individual_owner = res.vessel_ownership.individual_owner;
+                        this.vessel.vessel_ownership.owner = res.vessel_ownership.owner;
+                        this.vessel.vessel_ownership.proposal_id = res.vessel_ownership.proposal_id;
                         
-                        this.vessel.vessel_details.berth_mooring = res.body.vessel_details.berth_mooring;
-                        this.vessel.vessel_details.created = res.body.vessel_details.created;
-                        this.vessel.vessel_details.id = res.body.vessel_details.id;
-                        this.vessel.vessel_details.read_only = res.body.vessel_details.read_only;
-                        this.vessel.vessel_details.updated = res.body.vessel_details.updated;
-                        this.vessel.vessel_details.vessel = res.body.vessel_details.vessel;
-                        this.vessel.vessel_details.vessel_beam = res.body.vessel_details.vessel_beam;
-                        this.vessel.vessel_details.vessel_draft = res.body.vessel_details.vessel_draft;
-                        this.vessel.vessel_details.vessel_length = res.body.vessel_details.vessel_length;
-                        this.vessel.vessel_details.vessel_name = res.body.vessel_details.vessel_name;
-                        this.vessel.vessel_details.vessel_type = res.body.vessel_details.vessel_type;
-                        this.vessel.vessel_details.vessel_type_display = res.body.vessel_details.vessel_type_display;
-                        this.vessel.vessel_details.vessel_weight = res.body.vessel_details.vessel_weight;
+                        this.vessel.vessel_details.berth_mooring = res.vessel_details.berth_mooring;
+                        this.vessel.vessel_details.created = res.vessel_details.created;
+                        this.vessel.vessel_details.id = res.vessel_details.id;
+                        this.vessel.vessel_details.read_only = res.vessel_details.read_only;
+                        this.vessel.vessel_details.updated = res.vessel_details.updated;
+                        this.vessel.vessel_details.vessel = res.vessel_details.vessel;
+                        this.vessel.vessel_details.vessel_beam = res.vessel_details.vessel_beam;
+                        this.vessel.vessel_details.vessel_draft = res.vessel_details.vessel_draft;
+                        this.vessel.vessel_details.vessel_length = res.vessel_details.vessel_length;
+                        this.vessel.vessel_details.vessel_name = res.vessel_details.vessel_name;
+                        this.vessel.vessel_details.vessel_type = res.vessel_details.vessel_type;
+                        this.vessel.vessel_details.vessel_type_display = res.vessel_details.vessel_type_display;
+                        this.vessel.vessel_details.vessel_weight = res.vessel_details.vessel_weight;
                         
                         const payload = {
                             id: this.vessel.id,
@@ -946,8 +947,8 @@ export default {
     },
     created: async function () {
         if (this.proposal){
-            let res = await this.$http.get(`${api_endpoints.proposal}${this.proposal.id}/get_max_vessel_length_for_main_component?uuid=${this.proposal.uuid}`);
-            this.max_vessel_length_tuple = res.body
+            let res = await utils.fetchUrl(`${api_endpoints.proposal}${this.proposal.id}/get_max_vessel_length_for_main_component?uuid=${this.proposal.uuid}`);
+            this.max_vessel_length_tuple = res
         }
     },
 }

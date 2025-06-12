@@ -283,7 +283,7 @@
 <script>
 import Vue from 'vue'
 import $ from 'jquery'
-import { api_endpoints, helpers } from '@/utils/hooks'
+import { api_endpoints, helpers, utils } from '@/utils/hooks'
 import FormSection from '@/components/forms/section_toggle.vue'
 import FileField from '@/components/forms/filefield_immediate.vue'
 import alert from '@vue-utils/alert.vue'
@@ -500,8 +500,8 @@ export default {
         fetchProfile: async function(){
             console.log('in fetchProfile')
             let response = null;
-            response = await Vue.http.get(api_endpoints.profile + '/' + this.proposalId)
-            this.profile = Object.assign(response.body)
+            response = await utils.fetchUrl(api_endpoints.profile + '/' + this.proposalId)
+            this.profile = Object.assign(response)
 
             if (this.profile.residential_address_list !== undefined)
             {
@@ -551,9 +551,9 @@ export default {
         },
     },
     beforeRouteEnter: function(to,from,next){
-        Vue.http.get(api_endpoints.profile).then((response) => {
+        utils.fetchUrl(api_endpoints.profile).then((response) => {
             next(vm => {
-                vm.profile = Object.assign(response.body);
+                vm.profile = Object.assign(response);
             });           
         },(error) => {
             console.log(error);

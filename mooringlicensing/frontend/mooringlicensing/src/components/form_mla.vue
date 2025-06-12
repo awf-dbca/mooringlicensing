@@ -161,10 +161,10 @@
                 type: Boolean,
                 default: true,
             },
-            keepCurrentVessel:{
-                type: Boolean,
-                default: true, 
-            },
+            //keepCurrentVessel:{
+            //    type: Boolean,
+            //    default: true, 
+            //},
             // add_vessel: {
             //     type: Boolean,
             //     default: false,

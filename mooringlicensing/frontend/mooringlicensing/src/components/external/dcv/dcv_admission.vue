@@ -207,8 +207,6 @@ export default {
         PanelArrival,
         FormSection,
     },
-    watch: {
-    },
     computed: {
         pay_submit_button_enabled: function(){
             return this.valid_form

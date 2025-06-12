@@ -60,7 +60,7 @@ import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
 import FileField from '@/components/forms/filefield_immediate.vue'
 
-import {helpers} from "@/utils/hooks.js"
+import {helpers, utils} from "@/utils/hooks.js"
 export default {
     name:'amendment-request',
     components:{
@@ -133,12 +133,12 @@ export default {
         },
         fetchAmendmentChoices: function(){
             let vm = this;
-            vm.$http.get('/api/amendment_request_reason_choices.json').then((response) => {
-                vm.reason_choices = response.body;
-
-            },(error) => {
-                console.log(error);
-            } );
+            let request = utils.fetchUrl('/api/amendment_request_reason_choices.json')
+            request.then((response) => {
+                vm.reason_choices = response;
+            }).catch((error) => {
+                console.log(error.message);
+            });
         },
         sendData:function(){
             console.log('in sendData')
@@ -154,13 +154,14 @@ export default {
                     );
                     vm.amendingProposal = true;
                     vm.close();
-                    Vue.http.get(`/api/proposal/${vm.proposal.id}/internal_proposal.json`).then(
+                    let request = utils.fetchUrl(`/api/proposal/${vm.proposal.id}/internal_proposal.json`)
+                    request.then(
                         response => {
                             vm.$emit('refreshFromResponse', response);
-                        }, error => {
-                            console.log(error);
                         }
-                    );
+                    ).catch((error) => {
+                        console.log(error.message);
+                    });
                     vm.$router.push({ path: '/internal' }); //Navigate to dashboard after creating Amendment request
                 }, error => {
                     console.log(error);

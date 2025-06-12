@@ -136,9 +136,6 @@ export default {
     components:{
         FormSection,
     },
-    watch: {
-
-    },
     computed: {
         is_external: function() {
             return this.level == 'external'

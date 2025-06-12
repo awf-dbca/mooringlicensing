@@ -15,7 +15,8 @@
 <script>
 import FormSection from '@/components/forms/section_toggle.vue'
 import {
-  api_endpoints
+  api_endpoints,
+  utils,
 }
 from '@/utils/hooks'
 
@@ -50,9 +51,9 @@ from '@/utils/hooks'
                 this.$emit("mooringPreferenceChanged", preferenceChanged);
             },
             fetchMooringBays: async function(){
-                const response = await this.$http.get(api_endpoints.mooring_bays);
-                console.log(response.body)
-                for (let bay of response.body.results) {
+                const response = await utils.fetchUrl(api_endpoints.mooring_bays);
+                console.log(response)
+                for (let bay of response.results) {
                     this.mooringBays.push(bay)
                 }
             },

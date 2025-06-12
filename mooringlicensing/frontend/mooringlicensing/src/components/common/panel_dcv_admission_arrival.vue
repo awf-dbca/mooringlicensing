@@ -161,8 +161,6 @@ export default {
     components:{
         FormSection,
     },
-    watch: {
-    },
     computed: {
         radio_buttons_name: function() {
             return 'private_yes_no_' + this.uuid

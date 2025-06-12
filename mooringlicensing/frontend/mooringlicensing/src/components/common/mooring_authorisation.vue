@@ -58,7 +58,7 @@
             <div v-show="mooringAuthPreference==='ria'" class="row form-group">
                 <div class="col-sm-9">
                 <label for="ria_draggable" class="draggable-label-class control-label">Order the bays in your preferred order with most preferred bay on top</label>
-                <draggable 
+                <draggable
                 id="ria_draggable"
                 :disabled="readonly" 
                 :list="mooringBays"
@@ -66,7 +66,7 @@
                 class="list-group col-sm-5 draggable-class"
                 handle=".handle"
                 >
-                    <li
+                    <!--<li TODO fix this...
                         class="list-group-item"
                         v-for="mooring in mooringBays"
                         :key="mooring.name"
@@ -74,7 +74,7 @@
                         <i class="fa fa-align-justify handle"></i>
                         <span class="col-sm-1"/>
                         <span class="text">{{ mooring.name }}</span>
-                    </li>
+                    </li>-->
                 </draggable>
                 </div>
             </div>
@@ -83,13 +83,15 @@
 </template>
 
 <script>
+
 import FormSection from '@/components/forms/section_toggle.vue'
 import datatable from '@/utils/vue/datatable.vue'
 import {
-  api_endpoints
+  api_endpoints,
+  utils,
 }
 from '@/utils/hooks'
-import draggable from 'vuedraggable';
+import draggable from "vuedraggable";
 
     export default {
         name:'MooringAuthorisation',
@@ -284,20 +286,29 @@ import draggable from 'vuedraggable';
                 vm.site_licensee_datatable_key++;
             },
             fetchMooringBays: async function(){
-                const response = await this.$http.get(api_endpoints.mooring_bays);
+                const response = await utils.fetchUrl(api_endpoints.mooring_bays);
+
                 // reorder array based on proposal.bay_preferences_numbered
                 if (this.proposal.bay_preferences_numbered) {
                     let newArray = [];
                     for (let n of this.proposal.bay_preferences_numbered) {
-                        const found = response.body.results.find(el => el.id === n);
-                        newArray.push(found);
+                        const found = response.results.find(el => el.id === n);
+                        if (found !== undefined) {
+                            newArray.push(found);
+                        }
                     }
-                    // read ordered array into Vue array
-                    for (let bay of newArray) {
-                        this.mooringBays.push(bay);
+                    if (newArray) {
+                        // read ordered array into Vue array
+                        for (let bay of newArray) {
+                            this.mooringBays.push(bay);
+                        }
+                    } else {
+                        for (let bay of response.results) {
+                            this.mooringBays.push(bay);
+                        }
                     }
                 } else {
-                    for (let bay of response.body.results) {
+                    for (let bay of response.results) {
                         this.mooringBays.push(bay);
                     }
                 }

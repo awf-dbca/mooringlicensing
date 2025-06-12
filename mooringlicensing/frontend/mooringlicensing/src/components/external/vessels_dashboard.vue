@@ -120,8 +120,6 @@ export default {
         datatable,
         RecordSale,
     },
-    watch: {
-    },
     computed: {
         recordSaleKey: function() {
             return `${this.recordSaleId}_${this.uuid}`

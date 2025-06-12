@@ -60,7 +60,7 @@
 <script>
 import datatable from '@/utils/vue/datatable.vue'
 import Vue from 'vue'
-import { api_endpoints, helpers } from '@/utils/hooks'
+import { api_endpoints, helpers, utils } from '@/utils/hooks'
 import CreateNewStickerModal from "@/components/common/create_new_sticker_modal.vue"
 import RequestNewDCVStickerModal from "@/components/common/request_new_dcv_sticker_modal.vue"
 import RequestDCVStickerAddressModal from "@/components/common/request_dcv_sticker_address_modal.vue"
@@ -486,11 +486,12 @@ export default {
         fetchFilterLists: function(){
             let vm = this;
             // FeeSeason list
-            vm.$http.get(api_endpoints.fee_seasons_dict + '?application_type_codes=dcvp').then((response) => {
+            let request = utils.fetchUrl(api_endpoints.fee_seasons_dict + '?application_type_codes=dcvp')
+            request.then((response) => {
                 vm.fee_seasons = response.body
-            },(error) => {
-                console.log(error);
-            })
+            }).catch((error) => {
+                console.log(error.message);
+            });
         },
         addEventListeners: function(){
             let vm = this

@@ -92,7 +92,7 @@
 <script>
 import modal from '@vue-utils/bootstrap-modal.vue'
 import alert from '@vue-utils/alert.vue'
-import { helpers, api_endpoints } from "@/utils/hooks.js"
+import { helpers, api_endpoints, utils } from "@/utils/hooks.js"
 
 export default {
     name:'RequestNewDCVStickerModal',
@@ -133,11 +133,11 @@ export default {
             let vm = this
             // Whenever dcv_permit_id is changed, update this.stickers
             if (vm.dcv_permit_id){
-                const ret = await vm.$http.get(helpers.add_endpoint_json('/api/internal_dcv_permit/', vm.dcv_permit_id + '/stickers'))
-                for (let sticker of ret.body.stickers){
+                const ret = await utils.fetchUrl(helpers.add_endpoint_json('/api/internal_dcv_permit/', vm.dcv_permit_id + '/stickers'))
+                for (let sticker of ret.stickers){
                     sticker.checked = false
                 }
-                vm.stickers = ret.body.stickers
+                vm.stickers = ret.stickers
                 console.log('vm.stickers')
                 console.log(vm.stickers)
 
@@ -243,8 +243,11 @@ export default {
         },
         fetchCountries: function () {
             let vm = this;
-            vm.$http.get(api_endpoints.countries).then((response) => {
-                vm.countries = response.body;
+            let request = utils.fetchUrl(api_endpoints.countries);
+            request.then((response) => {
+                vm.countries = response;
+            }).catch((error) => {
+                console.log(error.message);
             });
         },
     },
