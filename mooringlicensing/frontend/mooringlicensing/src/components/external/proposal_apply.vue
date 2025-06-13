@@ -236,11 +236,12 @@ import FormSection from '@/components/forms/section_toggle.vue'
 
 import {
     api_endpoints,
-    helpers
+    helpers,
+    utils,
 }
     from '@/utils/hooks'
-import utils from './utils'
-export default {
+import u from './utils'
+export default {    
     props: {
         is_internal: {
             type: Boolean,
@@ -634,38 +635,38 @@ export default {
             return [];
         },
         fetchApplicationTypes: async function () {
-            const response = await this.$http.get(api_endpoints.application_types_dict + '?apply_page=True');
-            for (let app_type of response.body) {
+            const response = await utils.fetchUrl(api_endpoints.application_types_dict + '?apply_page=True');
+            for (let app_type of response) {
                 this.application_types_and_licences.push(app_type)
             }
         },
         fetchExistingLicences: async function () {
             if (this.is_internal && this.applicant_system_id) {
-                const response = await this.$http.get(api_endpoints.existing_licences + '?applicant_system_id='+this.applicant_system_id);
-                for (let l of response.body) {
+                const response = await utils.fetchUrl(api_endpoints.existing_licences + '?applicant_system_id='+this.applicant_system_id);
+                for (let l of response) {
                     this.application_types_and_licences.push(l)
                 }
             } else {
-                const response = await this.$http.get(api_endpoints.existing_licences);
-                for (let l of response.body) {
+                const response = await utils.fetchUrl(api_endpoints.existing_licences);
+                for (let l of response) {
                     this.application_types_and_licences.push(l)
                 }
             }            
         },
         fetchWlaAllowed: async function () {
             if (this.is_internal && this.applicant_system_id) {
-                const response = await this.$http.get(api_endpoints.wla_allowed+ '?applicant_system_id='+this.applicant_system_id);
-                this.newWlaAllowed = response.body.wla_allowed;
+                const response = await utils.fetchUrl(api_endpoints.wla_allowed+ '?applicant_system_id='+this.applicant_system_id);
+                this.newWlaAllowed = response.wla_allowed;
             } else {
-                const response = await this.$http.get(api_endpoints.wla_allowed);
-                this.newWlaAllowed = response.body.wla_allowed;
+                const response = await utils.fetchUrl(api_endpoints.wla_allowed);
+                this.newWlaAllowed = response.wla_allowed;
             }
         },
         fetchCurrentSeason: async function () {
-            const response = await this.$http.get(api_endpoints.current_season);
-            console.log(response.body)
-            if (response.body.length) {
-                this.season_text = response.body[0].start_date + ' to ' + response.body[0].end_date
+            const response = await utils.fetchUrl(api_endpoints.current_season);
+            console.log(response)
+            if (response.length) {
+                this.season_text = response[0].start_date + ' to ' + response[0].end_date
             }
         }
     },
@@ -718,7 +719,7 @@ export default {
     beforeRouteEnter: function (to, from, next) {
 
         let initialisers = [
-            utils.fetchProfile(),
+            u.fetchProfile(),
         ]
         next(vm => {
             vm.loading.push('fetching profile')

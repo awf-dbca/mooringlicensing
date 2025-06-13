@@ -187,7 +187,7 @@ import CommsLogs from '@common-utils/comms_logs.vue'
 import Applicant from '@/components/common/applicant.vue'
 import Vessels from '@/components/common/vessels.vue'
 import FormSection from "@/components/forms/section_toggle.vue"
-import { api_endpoints, helpers } from '@/utils/hooks'
+import { api_endpoints, helpers, utils } from '@/utils/hooks'
 export default {
   name: 'ApprovalDetail',
   data() {
@@ -339,9 +339,9 @@ export default {
       },
   },
   created: async function(){
-      const response = await Vue.http.get(helpers.add_endpoint_json(api_endpoints.approvals,this.$route.params.approval_id));
-      this.approval = Object.assign({}, response.body);
-      this.approval.applicant_id = response.body.applicant_id;
+      const response = await utils.fetchUrl(helpers.add_endpoint_json(api_endpoints.approvals,this.$route.params.approval_id));
+      this.approval = Object.assign({}, response);
+      this.approval.applicant_id = response.applicant_id;
 
       await this.$nextTick(() => {
           if (this.approval && this.approval.id && this.authorisedUserPermit) {

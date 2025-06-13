@@ -407,13 +407,13 @@ export default {
 
     fetchProfile: function(){
         let vm = this;
-        Vue.http.get(api_endpoints.profile).then((response) => {
-            vm.profile = response.body
-                              
-         },(error) => {
-            console.log(error);
-                
-        })
+        let request = utils.fetchUrl(api_endpoints.profile)
+        request.then((response) => {
+           vm.profile = response.body
+                             
+        }).catch((error) => {
+               console.log(error.message);
+           });
         },
 
     check_assessor: function(){

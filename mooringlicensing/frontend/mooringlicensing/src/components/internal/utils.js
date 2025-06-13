@@ -26,21 +26,21 @@ export default {
     },
     fetchUser: function(id){
         return new Promise ((resolve,reject) => {
-            Vue.http.get(helpers.add_endpoint_json(api.users,id)).then((response) => {
+            let request = utils.fetchUrl(helpers.add_endpoint_json(api.users,id))
+            request.then((response) => {
                 resolve(response.body);
-            },
-            (error) => {
-                reject(error);
+            }).catch((error) => {
+                console.log(error.message);
             });
         });
     },
     fetchProfile: function (){
         return new Promise ((resolve,reject) => {
-            Vue.http.get(api.profile).then((response) => {
+            let request = utils.fetchUrl(api.profile)
+            request.then((response) => {
                 resolve(response.body);
-            },
-            (error) => {
-                reject(error);
+            }).catch((error) => {
+                console.log(error.message);
             });
         });
 
