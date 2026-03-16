@@ -1,6 +1,12 @@
 <template lang="html">
     <div id="vessels">
         <FormSection label="Registration Details" Index="registration_details" v-if="!forEndorser">
+            <div v-if="!is_internal && proposal.proposal_type.code === 'new' && !proposal.reissued && proposal.processing_status == 'Draft' && proposal.application_type_dict.code == 'mla'" class="row form-group">
+                <div class="alert alert-info" style="width: 95%; margin-left: 2.5%;">Vessel details are based on what is on your current Waiting List Allocation. If these details are not correct, please request assistance.</div>
+            </div>
+            <div v-else-if="is_internal && proposal.proposal_type.code === 'new' && !proposal.reissued && !readonly && proposal.application_type_dict.code == 'mla'" class="row form-group">
+                <div class="alert alert-info" style="width: 95%; margin-left: 2.5%;">Vessel details are based on what is on the current Waiting List Allocation. Customer may require assistance if these details are not up to date.</div>
+            </div>
             <div class="row form-group">
                 <label for="vessel_search" class="col-sm-3 control-label">Vessel registration <span style="color: red;">*</span></label>
                 <div class="col-sm-9">

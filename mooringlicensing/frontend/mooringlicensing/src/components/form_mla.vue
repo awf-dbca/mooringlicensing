@@ -204,7 +204,8 @@
             },
             readonlyMLA: function() {
                 let readonly = false;
-                if (this.readonly || (this.proposal.proposal_type.code === 'new' && !this.proposal.reissued)) {
+                console.log(this.readonly, this.proposal.proposal_type.code, this.proposal.reissued,this.is_internal)
+                if (this.readonly || (this.proposal.proposal_type.code === 'new' && !this.proposal.reissued && !this.is_internal)) {
                     readonly = true;
                 }
                 return readonly;
