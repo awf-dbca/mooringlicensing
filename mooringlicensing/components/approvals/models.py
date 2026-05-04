@@ -2186,20 +2186,12 @@ class MooringLicence(Approval):
             i.active = False
             i.save()
             
-            sticker = i.sticker
-            if sticker and sticker.status in [Sticker.STICKER_STATUS_CURRENT]:
-                #set moa stickers that are current to to be returned
-                sticker.status = Sticker.STICKER_STATUS_TO_BE_RETURNED
-                sticker.save()
-            elif sticker and sticker.status in [Sticker.STICKER_STATUS_NOT_READY_YET, Sticker.STICKER_STATUS_READY, Sticker.STICKER_STATUS_AWAITING_PRINTING]:
-                #set moa stickers in progress (not ready, ready, awaiting printing) to cancelled
-                sticker.status = Sticker.STICKER_STATUS_CANCELLED
-                sticker.save()
+            i.approval.manage_stickers()  
 
             #TODO this could be problematic if doc gen takes too long 
             #consider replacing with a cronjob (this applies to anywhere where generate_doc is called n times)
             if i.approval:
-                i.approval.generate_doc()
+                i.approval.generate_doc() #TODO this should be delayed instead of done on request
 
         #update aup pdf
         self.generate_au_summary_doc()
