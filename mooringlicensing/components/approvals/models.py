@@ -2180,11 +2180,26 @@ class MooringLicence(Approval):
 
     def processes_after_cancel(self):
         #remove mooring from AUPs and set their stickers to be returned
-        moas = MooringOnApproval.objects.filter(mooring__mooring_licence=self)
+        moas = MooringOnApproval.objects.filter(mooring__mooring_licence=self).filter(end_date=None)
         for i in moas:
             i.end_date = datetime.date.today()
             i.active = False
             i.save()
+            
+            sticker = i.sticker
+            if sticker and sticker.status in [Sticker.STICKER_STATUS_CURRENT]:
+                #set moa stickers that are current to to be returned
+                sticker.status = Sticker.STICKER_STATUS_TO_BE_RETURNED
+                sticker.save()
+            elif sticker and sticker.status in [Sticker.STICKER_STATUS_NOT_READY_YET, Sticker.STICKER_STATUS_READY, Sticker.STICKER_STATUS_AWAITING_PRINTING]:
+                #set moa stickers in progress (not ready, ready, awaiting printing) to cancelled
+                sticker.status = Sticker.STICKER_STATUS_CANCELLED
+                sticker.save()
+
+            #TODO this could be problematic if doc gen takes too long 
+            #consider replacing with a cronjob (this applies to anywhere where generate_doc is called n times)
+            if i.approval:
+                i.approval.generate_doc()
 
         #update aup pdf
         self.generate_au_summary_doc()
