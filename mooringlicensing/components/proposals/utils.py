@@ -611,7 +611,7 @@ def submit_vessel_data(instance, request, vessel_data=None, approving=False):
 
         # record ownership data
         vessel_ownership = store_vessel_ownership(request, vessel, instance)
-        instance.vessel_ownership = vessel_ownership #TODO investigate why this would ever be None
+        instance.vessel_ownership = vessel_ownership
         instance.save()
 
     if request:
