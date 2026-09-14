@@ -2626,7 +2626,11 @@ class Proposal(RevisionedMixin):
                 proposal.previous_application = self
                 proposal.approval = self.approval
                 proposal.mooring_authorisation_preference = self.mooring_authorisation_preference
-                proposal.null_vessel_on_create = not self.vessel_on_proposal()
+
+                if self.approval and  self.approval.vessel_ownerships and self.application_type_code == 'mla':
+                    proposal.null_vessel_on_create = not self.approval.vessel_ownerships.count() > 0
+                else:
+                    proposal.null_vessel_on_create = not self.vessel_on_proposal()
 
                 logger.info(f'Cloning the proposal: [{self}] to the proposal: [{proposal}]...')
 
