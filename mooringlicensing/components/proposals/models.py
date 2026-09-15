@@ -2201,7 +2201,7 @@ class Proposal(RevisionedMixin):
             except:
                 raise
 
-    def final_approval_for_WLA_AAA(self, request, details=None):
+    def final_approval_for_WLA_AAA(self, request=None, details=None):
         from mooringlicensing.components.proposals.utils import submit_vessel_data
         from mooringlicensing.components.payments_ml.models import FeeItemApplicationFee
         with transaction.atomic():
